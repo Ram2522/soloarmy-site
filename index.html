@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solo Army: your own AI team, running on your own plan</title>
+<meta name="description" content="Solo Army gives one person a whole team of AI agents that run on your own machine and your own AI plan. Join the waitlist.">
+<link rel="canonical" href="https://soloarmy.app/">
+<meta property="og:title" content="Solo Army">
+<meta property="og:description" content="One person. A whole army of AI agents. Join the waitlist.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soloarmy.app/">
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;font:18px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;background:#0d0d10;color:#ececf1}
+main{max-width:640px;margin:0 auto;padding:12vh 24px 8vh}
+h1{font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.1;margin:0 0 16px}
+h1 span{color:#e5b84b}
+p.lead{color:#b8b8c4;margin:0 0 32px}
+ul{padding-left:1.1em;color:#b8b8c4;margin:0 0 36px}
+li{margin:6px 0}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input[type=email]{flex:1 1 240px;padding:14px 16px;border-radius:10px;border:1px solid #33333d;background:#16161b;color:inherit;font:inherit}
+button{padding:14px 22px;border:0;border-radius:10px;background:#e5b84b;color:#111;font:inherit;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6}
+.hp{position:absolute;left:-9999px}
+#msg{min-height:1.6em;margin-top:14px;color:#e5b84b}
+#count{color:#8a8a97;font-size:.9rem;margin-top:8px}
+footer{margin-top:64px;color:#6f6f7b;font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>One person.<br><span>A whole army.</span></h1>
+<p class="lead">Solo Army is a team of AI agents that works for you every day, on your own computer and your own AI plan. You give the orders. It finds the money, ships the work and tells you what needs you.</p>
+<ul>
+<li>Runs on your machine. Nothing of yours sits on our servers.</li>
+<li>Works with the AI plan you already pay for.</li>
+<li>Asks you only for the decisions that are really yours.</li>
+</ul>
+<form id="f" novalidate>
+<input type="email" id="email" name="email" placeholder="you@email.com" autocomplete="email" required aria-label="Email">
+<input class="hp" type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+<button id="b" type="submit">Join the waitlist</button>
+</form>
+<div id="msg" role="status"></div>
+<div id="count"></div>
+<footer>© Solo Army. Early access, no spam, one email when it opens.</footer>
+</main>
+<script>
+// Set to the Apps Script web app URL (Code.gs) once deployed.
+var ENDPOINT = "";
+var f=document.getElementById("f"),m=document.getElementById("msg"),b=document.getElementById("b"),c=document.getElementById("count");
+function show(t){m.textContent=t}
+f.addEventListener("submit",function(e){
+  e.preventDefault();
+  var email=document.getElementById("email").value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){show("That email doesn't look right.");return}
+  if(document.getElementById("website").value){show("You're on the list.");return}
+  if(!ENDPOINT){show("Signups open shortly. Please check back soon.");return}
+  b.disabled=true;
+  fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({email:email,website:""})})
+   .then(function(r){return r.json()})
+   .then(function(j){show(j&&j.ok?"You're on the list. Watch your inbox.":"Something went wrong. Try again.");if(j&&j.count)c.textContent=j.count+" people waiting";})
+   .catch(function(){show("Something went wrong. Try again.")})
+   .then(function(){b.disabled=false});
+});
+if(ENDPOINT){fetch(ENDPOINT).then(function(r){return r.json()}).then(function(j){if(j&&j.count>=10)c.textContent=j.count+" people waiting"}).catch(function(){})}
+</script>
+</body>
+</html>
